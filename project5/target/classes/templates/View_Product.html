@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>JSP Page</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+	<div class="container">
+		<div class="nav1"></div>
+
+		<div class="test">
+
+			<div class="sidebar">
+				<label th:text="${NAME}"></label>
+				<label th:text="'hello: ' + ${session.USERNAME}"
+					style="display: inline; padding: 60px; font-size: 12; color: red;">
+				</label>
+				<a href="/product/productList">Danh mục 1</a>
+				<a href="/sell/ListSell">Danh mục 2</a>
+				
+				<a href="#">Danh mục 4</a>
+				<label style="padding: 40px;">
+					<a href="/user/logout" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?')">Logout</a>
+				</label>
+			</div>
+
+			<div class="content">
+
+				<h2>LIST PRODUCT</h2>
+				<p><a class="btn btn-primary" href="/product/">ADD PRODUCT</a></p>
+				<!--		<p style="text-align: right;">
+				<label th:text="'hello: ' + ${session.USERNAME}" style="display: inline;"> </label>
+				<a href="/user/logout" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?')"> Logout</a>
+			</p>-->
+
+				<div class="form-group">
+					<label for="categorySelect">Category</label>
+					<select class="form-control" style="width: 100px;" id="categorySelect" onchange="loadCategory()">
+						<option value="all">All</option> <!-- Thêm option "All" với giá trị "all" -->
+						<th:block th:each="category: ${CATEGORYS}">
+							<option th:value="${category.id}" th:text="${category.name}"></option>
+						</th:block>
+					</select>
+				</div>
+
+				<label class="a1" style="margin-left: 500px;">
+					<p style="color: red" th:text="${ERROR}"></p>
+				</label>
+
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Mã sản phẩm</th>
+							<th>Tên sản phẩm</th>
+							<th>Ảnh sản phẩm</th>
+							<th>Giá sản phẩm</th>
+							<th>Số lượng sản phẩm</th>
+							<th>mô tả sản phẩm</th>
+							<th>Khối lượng sản phẩm</th>
+							<th>Loại SP</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item : ${PRODUCT}">
+							<td th:text="${item.maSP}"></td>
+							<td th:text="${item.name}"></td>
+							<td width="100"><img alt="" th:src="@{'/getimage/'+${item.photo}}" width="80" height="70">
+							</td>
+							<td th:text="${item.price}"></td>
+							<td th:text="${item.quantity}"></td>
+							<td th:text="${item.description}"></td>
+							<td th:text="${item.volume}"></td>
+							<td th:text="${item.category.name}"></td>
+							<td>
+								<a class="btn btn-primary btn-sm" th:href="@{'/product/edit/'+${item.id}}">Edit</a> |
+								<a class="btn btn-danger btn-sm" th:href="@{'/product/delete/'+${item.id}}">Del</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+
+
+	<script>
+		// Thêm sự kiện onchange vào thẻ select
+		document.getElementById("categorySelect").addEventListener("change", function () {
+			var selectedCategoryId = this.value;
+			if (selectedCategoryId === "all") {
+				// Nếu người dùng chọn "All", chuyển hướng đến trang danh sách sản phẩm
+				window.location.href = "/product/productList";
+				localStorage.setItem("selectedCategoryId", selectedCategoryId);
+			} else {
+				// Nếu không, lưu giá trị đã chọn vào localStorage và chuyển hướng đến trang sản phẩm với danh mục được chọn
+				localStorage.setItem("selectedCategoryId", selectedCategoryId);
+				window.location.href = "/product/search/" + selectedCategoryId;
+			}
+		});
+
+		// Kiểm tra nếu đã lưu giá trị trong localStorage, thì khôi phục giá trị đó khi trang được tải lại
+		window.onload = function () {
+			var selectedCategoryId = localStorage.getItem("selectedCategoryId");
+			if (selectedCategoryId) {
+				document.getElementById("categorySelect").value = selectedCategoryId;
+			}
+		}
+	</script>
+
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		.container {
+
+			justify-content: flex-start;
+			width: 100%;
+			margin-left: -15px;
+		}
+
+		.nav1 {
+			background-color: rgb(204, 202, 208);
+			width: 100%;
+			height: 20px;
+			position: fixed;
+
+		}
+
+		.test {
+			display: flex;
+		}
+
+		.sidebar {
+			width: 12%;
+			position: fixed;
+			height: 100vh;
+			background-color: rgb(204, 202, 208);
+			color: rgb(0, 0, 0);
+
+		}
+
+		.sidebar a {
+			margin-top: 15px;
+			text-align: center;
+			padding: 10px 15px;
+			text-decoration: none;
+			font-size: 18px;
+			color: rgb(0, 0, 0);
+			display: block;
+			transition: background-color 0.3s;
+		}
+
+		.sidebar a:hover {
+			background-color: rgb(192, 192, 192);
+			text-decoration: none;
+			/* Thêm underline cho chữ khi hover */
+			border: 1px solid #fff;
+			/* Thêm border cho chữ khi hover */
+			border-radius: 7px;
+		}
+
+		.content {
+			padding-left: 14%;
+			padding-top: 20px;
+			width: 98%;
+			/* Thay đổi giá trị này để mở rộng bề ngang */
+			background-color: #fff;
+			min-height: 100vh;
+			overflow: auto;
+		}
+	</style>
+
+
+
+</body>
+
+</html>
